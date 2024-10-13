@@ -69,4 +69,49 @@ const getAllUser = asyncHandler(async (req, res) => {
   const users = await User.find({});
   res.status(200).json(users);
 });
-export { createUser, loginUser, logoutCurrentUser, getAllUser };
+
+const getCurrentUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    res.status(200).json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+});
+
+const updateCurrentUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { username, email, password } = req.body;
+  if (user) {
+    user.username = req.body.username || user.username;
+    user.email = req.body.email || user.email;
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      user.password = hashedPassword;
+    }
+    const updatesUser = await user.save();
+    res.status(200).json({
+      _id: updatesUser._id,
+      username: updatesUser.username,
+      email: updatesUser.email,
+      isAdmin: updatesUser.isAdmin,
+    });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+});
+
+export {
+  createUser,
+  loginUser,
+  logoutCurrentUser,
+  getAllUser,
+  getCurrentUserProfile,
+  updateCurrentUserProfile,
+};

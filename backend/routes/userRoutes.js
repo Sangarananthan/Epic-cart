@@ -4,6 +4,8 @@ import {
   loginUser,
   logoutCurrentUser,
   getAllUser,
+  getCurrentUserProfile,
+  updateCurrentUserProfile,
 } from "../controllers/userController.js";
 import {
   authenticate,
@@ -17,4 +19,9 @@ userRoutes
   .get(authenticate, authorizedAdmin, getAllUser);
 userRoutes.post("/auth", loginUser);
 userRoutes.post("/logout", logoutCurrentUser);
+
+userRoutes
+  .route("/profile")
+  .get(authenticate, getCurrentUserProfile)
+  .post(authenticate, updateCurrentUserProfile);
 export default userRoutes;
