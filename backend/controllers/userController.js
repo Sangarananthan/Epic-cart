@@ -31,4 +31,25 @@ const createUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { createUser };
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    const isValidPassword = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
+
+    if (isValidPassword) {
+      createTokens(res, existingUser._id);
+      res.status(200).json({
+        _id: existingUser.id,
+        username: existingUser.username,
+        email: existingUser.email,
+        isAdmin: existingUser.isAdmin,
+      });
+    }
+  }
+});
+
+export { createUser, loginUser, logoutCurrentUser };
