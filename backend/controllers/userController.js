@@ -39,16 +39,21 @@ const loginUser = asyncHandler(async (req, res) => {
       password,
       existingUser.password
     );
-
     if (isValidPassword) {
       createTokens(res, existingUser._id);
       res.status(200).json({
+        message: "User succesfully logged in",
         _id: existingUser.id,
         username: existingUser.username,
         email: existingUser.email,
         isAdmin: existingUser.isAdmin,
       });
+    } else {
+      res.status(400).json({ message: "Invalid credentials" });
     }
+  }
+  if (!existingUser) {
+    res.status(400).json({ message: "User does not exist" });
   }
 });
 
@@ -60,4 +65,8 @@ const logoutCurrentUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 });
 
-export { createUser, loginUser, logoutCurrentUser };
+const getAllUser = asyncHandler(async (req, res) => {
+  const users = await User.find({});
+  res.status(200).json(users);
+});
+export { createUser, loginUser, logoutCurrentUser, getAllUser };
