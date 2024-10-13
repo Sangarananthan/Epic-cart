@@ -2,8 +2,11 @@
   "name": "epic-cart",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && nodemon index.js",
+    "fullstack": "concurrently \"npm run backend\" \"npm run frontend\""
   },
   "keywords": [],
   "author": "",
