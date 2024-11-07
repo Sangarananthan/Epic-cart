@@ -2,6 +2,8 @@ import { asyncHandler } from "../middlewares/asyncHandler.js";
 import User from "../model/userModal.js";
 import bcrypt from "bcryptjs";
 import createTokens from "../utils/createTokens.js";
+
+
 const createUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
@@ -88,11 +90,11 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const { username, email, password } = req.body;
   if (user) {
-    user.username = req.body.username || user.username;
-    user.email = req.body.email || user.email;
-    if (req.body.password) {
+    user.username = username || user.username;
+    user.email = email || user.email;
+    if (password) {
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
     }
     const updatesUser = await user.save();
@@ -107,6 +109,29 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  console.log(req.params.id);
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400).json({ message: "Admins cant be deleted" });
+    }
+    await User.deleteOne({ _id: user._id });
+    res.json({ message: "User removed" });
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+});
+
 export {
   createUser,
   loginUser,
@@ -114,4 +139,6 @@ export {
   getAllUser,
   getCurrentUserProfile,
   updateCurrentUserProfile,
+  deleteUser,
+  getUserById,
 };

@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../model/userModal.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 const JWT_SECRET = process.env.JWT_SECRET || "fU";
+
 const authenticate = asyncHandler(async (req, res, next) => {
   let token;
   token = req.cookies.jwt;
